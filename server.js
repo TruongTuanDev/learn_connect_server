@@ -3,13 +3,15 @@ const cors = require("cors");
 const cookieSession = require("cookie-session");
 
 const dbConfig = require("./app/config/db.config");
+const authConfig = require("./app/config/auth.config");
+
 
 const app = express();
 
 var corsOptions = {
   origin: "http://localhost:8080",
   methods: ['GET', 'POST'],
-};
+}; 
 
 app.use(cors(corsOptions));
 
@@ -22,7 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(
   cookieSession({
     name: "amica-session",
-    secret: "COOKIE_SECRET", // should use as secret environment variable
+    secret: authConfig.secret, // should use as secret environment variable
     httpOnly: true
   })
 );

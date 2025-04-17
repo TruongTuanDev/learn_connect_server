@@ -8,10 +8,24 @@ const authConfig = require("./app/config/auth.config");
 
 const app = express();
 
-var corsOptions = {
-  origin: "http://localhost:8080",
+// var corsOptions = {
+//   origin: "http://localhost:8080",
+//   methods: ['GET', 'POST'],
+// };
+
+const corsOptions = {
+  origin: function (origin, callback) {
+    // Cho phép các origin từ localhost và 127.0.0.1 với mọi port
+    if (!origin || /^http:\/\/(localhost|127\.0\.0\.1):\d+$/.test(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   methods: ['GET', 'POST'],
-}; 
+  credentials: true
+};
+
 
 app.use(cors(corsOptions));
 
@@ -40,7 +54,7 @@ db.mongoose
   .then(() => {
     console.log("Successfully connect to MongoDB.");
     initial();
- 
+
   })
   .catch(err => {
     console.error("Connection error", err);
@@ -55,6 +69,7 @@ app.get("/", (req, res) => {
 // routes
 require("./app/routes/auth.routes")(app);
 require("./app/routes/user.routes")(app);
+require("./app/routes/post.routes")(app);
 
 // set port, listen for requests
 const PORT = process.env.PORT || 8080;

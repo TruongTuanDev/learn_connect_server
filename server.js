@@ -24,6 +24,7 @@ var corsOptions = {
   credentials: true,
 };
 
+
 app.use(cors(corsOptions));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -46,6 +47,7 @@ db.mongoose
   .then(() => {
     console.log("Successfully connect to MongoDB.");
     initial();
+
   })
   .catch((err) => {
     console.error("Connection error", err);
@@ -71,6 +73,12 @@ const users = {}; // mapping: userId -> socket.id
 
 io.on("connection", (socket) => {
   console.log("User connected:", socket.id);
+
+// routes
+require("./app/routes/auth.routes")(app);
+require("./app/routes/user.routes")(app);
+require("./app/routes/post.routes")(app);
+
 
   // Đăng ký khi user kết nối (server nhận được thông tin userId)
   socket.on("join", ({ userId }) => {

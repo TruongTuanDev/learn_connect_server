@@ -79,7 +79,13 @@ io.on("connection", (socket) => {
 require("./app/routes/auth.routes")(app);
 require("./app/routes/user.routes")(app);
 
-
+require('./app/routes/flashcards.routes')(app);
+// set port, listen for requests
+const PORT = process.env.PORT || 8080;
+console.log("Routes registered:");
+console.log(app._router.stack.map(r => r.route && r.route.path).filter(Boolean));
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}.`);
 require("./app/routes/post.routes")(app);
 
 
@@ -127,10 +133,7 @@ require("./app/routes/post.routes")(app);
   });
 });
 
-// Start server
-const PORT = process.env.PORT || 8080;
-server.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}.`);
+
 });
 
 function initial() {

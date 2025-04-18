@@ -15,20 +15,23 @@ exports.signup = async (req, res) => {
       email: req.body.email,
       password: hashedPassword,
     });
-
+    console.log("user đó là", String(user.username));
     await user.save();
 
-    if (req.body.roles) {
+    if (req.body.roles && req.body.roles.length > 0) {
+      
       const roles = await Role.find({ name: { $in: req.body.roles } });
-      user.roles = roles.map((role) => role._id);
+  
+    
+      user.roles = roles.map(role => role._id);
     } else {
+      
       const defaultRole = await Role.findOne({ name: "user" });
       user.roles = [defaultRole._id];
     }
 
     await user.save();
     res.send({ message: "User was registered successfully!" });
-    res.status(200).send({ message: "User was registered successfully!" });
   } catch (err) {
     res.status(500).send({ message: err.message });
   }

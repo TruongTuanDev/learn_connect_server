@@ -19,18 +19,12 @@ const io = new Server(server, {
 });
 
 var corsOptions = {
-<<<<<<< HEAD
-  origin: ["http://127.0.0.1:5500", "http://localhost:5500"], // thêm frontend port
-  methods: ['GET', 'POST'],
-  credentials: true
-}; 
-=======
+
   origin: "*",
   methods: ["GET", "POST"],
   credentials: true,
 };
 
->>>>>>> bb8585185275a50f63f42d3323c653dc531b56ae
 
 app.use(cors(corsOptions));
 app.use(express.json());
@@ -84,6 +78,8 @@ io.on("connection", (socket) => {
 // routes
 require("./app/routes/auth.routes")(app);
 require("./app/routes/user.routes")(app);
+
+
 require("./app/routes/post.routes")(app);
 
 

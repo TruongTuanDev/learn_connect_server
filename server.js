@@ -7,26 +7,19 @@ const dbConfig = require("./app/config/db.config");
 const authConfig = require("./app/config/auth.config");
 
 const app = express();
-const server = http.createServer(app); // Dùng http để kết hợp với socket.io
+const server = http.createServer(app); // Dùng http server cho socket.io
 const { Server } = require("socket.io");
 
 const io = new Server(server, {
   cors: {
-    origin: "*", // địa chỉ frontend (sửa nếu khác)
+    origin: "*",
     methods: ["GET", "POST"],
-    credentials: true
-  }
+    credentials: true,
+  },
 });
 
-var corsOptions = {
-
-  origin: "*",
-  methods: ["GET", "POST"],
-  credentials: true,
-};
-
-
-app.use(cors(corsOptions));
+// Middleware
+app.use(cors({ origin: "*", methods: ["GET", "POST"], credentials: true }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(
@@ -37,7 +30,8 @@ app.use(
   })
 );
 
-const db = require("./app/models");
+// MongoDB
+const db = require("./app/models"); // ✅ đảm bảo index.js tồn tại
 const Role = db.role;
 
 db.mongoose
@@ -46,57 +40,41 @@ db.mongoose
     useUnifiedTopology: true,
   })
   .then(() => {
-    console.log("Successfully connect to MongoDB.");
+    console.log("✅ Successfully connected to MongoDB.");
     initial();
-
   })
   .catch((err) => {
-    console.error("Connection error", err);
+    console.error("❌ MongoDB connection error:", err);
     process.exit();
   });
 
 // Routes
 require("./app/routes/auth.routes")(app);
 require("./app/routes/user.routes")(app);
+require("./app/routes/flashcards.routes")(app);
+require("./app/routes/post.routes")(app);
 
-//Message API
 const messageRoutes = require("./app/routes/message.routes");
 app.use("/api", messageRoutes);
 
-// Simple route
+// Test route
 app.get("/", (req, res) => {
   res.json({ message: "Welcome to the chat app!" });
 });
 
-const Message = db.message; 
-// Socket.IO logic
-const users = {}; // mapping: userId -> socket.id
+// Socket.IO
+const Message = db.message;
+const users = {}; // userId -> socket.id
 
 io.on("connection", (socket) => {
-  console.log("User connected:", socket.id);
+  console.log("🟢 User connected:", socket.id);
 
-// routes
-require("./app/routes/auth.routes")(app);
-require("./app/routes/user.routes")(app);
-
-require('./app/routes/flashcards.routes')(app);
-// set port, listen for requests
-const PORT = process.env.PORT || 8080;
-console.log("Routes registered:");
-console.log(app._router.stack.map(r => r.route && r.route.path).filter(Boolean));
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}.`);
-require("./app/routes/post.routes")(app);
-
-
-  // Đăng ký khi user kết nối (server nhận được thông tin userId)
   socket.on("join", ({ userId }) => {
     users[userId] = socket.id;
-    console.log(`User ${userId} registered with socket ${socket.id}`);
+    console.log(`🔗 User ${userId} registered with socket ${socket.id}`);
   });
 
-  // Nhận sự kiện gửi tin nhắn riêng từ client
-  socket.on("send-private-message", async({ senderId, receiverId, content }) => {
+  socket.on("send-private-message", async ({ senderId, receiverId, content }) => {
     const message = {
       senderId,
       receiverId,
@@ -106,24 +84,21 @@ require("./app/routes/post.routes")(app);
 
     try {
       const savedMessage = await new Message(message).save();
-      console.log("Message saved:", savedMessage);
+      console.log("💾 Message saved:", savedMessage);
     } catch (err) {
-      console.error("Error saving message:", err);
+      console.error("❌ Error saving message:", err);
     }
 
-    console.log(`Forwarding private message from ${senderId} to ${receiverId}:`, message);
     const receiverSocket = users[receiverId];
     if (receiverSocket) {
-      // Gửi tin nhắn chỉ đến socket của người nhận
       io.to(receiverSocket).emit("receive-private-message", message);
     } else {
-      console.log(`User ${receiverId} is not online.`);
+      console.log(`⚠️ User ${receiverId} is not online.`);
     }
   });
 
-  // Khi mất kết nối, xoá user khỏi mapping
   socket.on("disconnect", () => {
-    console.log("User disconnected:", socket.id);
+    console.log("🔴 User disconnected:", socket.id);
     for (const userId in users) {
       if (users[userId] === socket.id) {
         delete users[userId];
@@ -133,9 +108,13 @@ require("./app/routes/post.routes")(app);
   });
 });
 
-
+// Start server
+const PORT = process.env.PORT || 8080;
+server.listen(PORT, () => {
+  console.log(`🚀 Server is running on port ${PORT}`);
 });
 
+// Initialize default roles
 function initial() {
   Role.estimatedDocumentCount((err, count) => {
     if (!err && count === 0) {

@@ -10,6 +10,24 @@ const app = express();
 const server = http.createServer(app); // Dùng http để kết hợp với socket.io
 const { Server } = require("socket.io");
 
+const db = require("./app/models");
+const Role = db.role;
+
+db.mongoose
+  .connect(dbConfig.url, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => {
+    console.log("Successfully connect to MongoDB.");
+    initial();
+
+  })
+  .catch((err) => {
+    console.error("Connection error", err);
+    process.exit();
+  });
+
 const io = new Server(server, {
   cors: {
     origin: "*", // địa chỉ frontend (sửa nếu khác)
@@ -37,23 +55,6 @@ app.use(
   })
 );
 
-const db = require("./app/models");
-const Role = db.role;
-
-db.mongoose
-  .connect(dbConfig.url, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => {
-    console.log("Successfully connect to MongoDB.");
-    initial();
-
-  })
-  .catch((err) => {
-    console.error("Connection error", err);
-    process.exit();
-  });
 
 // Routes
 require("./app/routes/auth.routes")(app);

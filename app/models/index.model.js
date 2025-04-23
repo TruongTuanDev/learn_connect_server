@@ -10,6 +10,13 @@ db.role = require("./role.model")(mongoose);
 db.like = require("./like.model")(mongoose);
 db.comment = require("./comment.model")(mongoose);
 
+
 db.ROLES = ["user", "moderator", "admin"];
+
+db.FlashcardTopic = require("./flashcardTopic.model");
+db.FlashcardItem = require("./flashcardItem.model");
+db.message = require("./message.model");
+
+
 
 module.exports = db;

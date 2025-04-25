@@ -1,5 +1,6 @@
 const { verifySignUp } = require("../middlewares");
 const controller = require("../controllers/auth.controller");
+const controllerInfor = require("../controllers/userInfor.controller");
 
 module.exports = function(app) {
   const router = require("express").Router();
@@ -14,8 +15,15 @@ module.exports = function(app) {
   );
 
   router.post("/signin", controller.signin);
+  app.post("/api/auth/signout", controller.signout);
+
+  app.post(
+    "/api/auth/updateInfor",
+    controllerInfor.saveUserInfo
+  );
 
   router.post("/signout", controller.signout);
 
   app.use("/api/auth", router);
 };
+

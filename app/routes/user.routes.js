@@ -14,11 +14,16 @@ module.exports = function(app) {
     controller.moderatorBoard
   );
 
+
+  app.get( 
+    "/api/test/admin",
   router.get(
     "/admin",
     [authJwt.verifyToken, authJwt.isAdmin],
     controller.adminBoard
-  );
+  ));
+
 
   app.use("/api/test", router);
 };
+

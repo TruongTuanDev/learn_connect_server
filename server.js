@@ -65,7 +65,11 @@ try {
   require("./app/routes/like_comment.routes")(app);
   require("./app/routes/auth.routes")(app);
   require("./app/routes/user.routes")(app);
-  require("./app/routes/message.routes")(app);
+ 
+  //Message API
+  const messageRoutes = require("./app/routes/message.routes");
+  app.use("/api", messageRoutes);
+
   require("./app/routes/flashcards.routes")(app);
   console.log("Routes registered");
 } catch (err) {
@@ -110,6 +114,7 @@ console.log("Routes:");
 console.log(displayRoutes(app));
 
 // Socket.IO logic
+const Message = db.message; 
 const users = {};
 
 io.on("connection", (socket) => {
@@ -118,13 +123,78 @@ io.on("connection", (socket) => {
   socket.on("join", ({ userId }) => {
     users[userId] = socket.id;
     console.log(`User ${userId} registered with socket ${socket.id}`);
+    broadcastOnlineUsers();
+  });
+  // Nhận sự kiện gửi tin nhắn riêng từ client
+  socket.on("send-private-message", async({ senderId, receiverId, content }) => {
+    const message = {
+      senderId,
+      receiverId,
+      content,
+      timestamp: new Date(),
+    };
+
+    try {
+      const savedMessage = await new Message(message).save();
+      console.log("Message saved:", savedMessage);
+    } catch (err) {
+      console.error("Error saving message:", err);
+    }
+
+    console.log(`Forwarding private message from ${senderId} to ${receiverId}:`, message);
+    const receiverSocket = users[receiverId];
+    if (receiverSocket) {
+      // Gửi tin nhắn chỉ đến socket của người nhận
+      io.to(receiverSocket).emit("receive-private-message", message);
+    } else {
+      console.log(`User ${receiverId} is not online.`);
+    }
   });
 
+  // Khi mất kết nối, xoá user khỏi mapping
+  socket.on("disconnect", () => {
+    console.log("User disconnected:", socket.id);
+    for (const userId in users) {
+      if (users[userId] === socket.id) {
+        delete users[userId];
+        break;
+      }
+    }
+    broadcastOnlineUsers();
+  });
   // Thêm các sự kiện khác như: "send-message", "disconnect", v.v.
 });
+function broadcastOnlineUsers() {
+  const onlineUserIds = Object.keys(users); // users là mapping: { userId: socketId }
+  io.emit("online-users", onlineUserIds);
+}
+
 
 // Start server
 const PORT = process.env.PORT || 8080;
 server.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });
+async function initial() {
+  try {
+    if (typeof Role.countDocuments !== 'function') {
+      throw new Error("Role is not a valid Mongoose model. Check role.model.js and index.js");
+    }
+
+    const count = await Role.countDocuments();
+    if (count === 0) {
+      await new Role({ name: "user" }).save();
+      console.log("added 'user' to roles collection");
+
+      await new Role({ name: "moderator" }).save();
+      console.log("added 'moderator' to roles collection");
+
+      await new Role({ name: "admin" }).save();
+      console.log("added 'admin' to roles collection");
+    } else {
+      console.log("Roles already exist in the collection");
+    }
+  } catch (err) {
+    console.error("Error in initial function:", err);
+  }
+}

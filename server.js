@@ -118,7 +118,7 @@ const Message = db.message;
 const users = {};
 
 io.on("connection", (socket) => {
-  console.log("User connected:", socket.id);
+console.log("User connected:", socket.id);
 
   socket.on("join", ({ userId }) => {
     users[userId] = socket.id;

@@ -47,6 +47,8 @@ exports.findAll = async (req, res) => {
     );
 
     res.status(200).json(updatedPosts);
+    console.log("ok nhanha:");
+
   } catch (err) {
     console.error("Error in findAll:", err);
     res.status(500).json({ message: err.message || "Error retrieving posts." });

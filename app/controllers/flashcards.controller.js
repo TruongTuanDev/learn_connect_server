@@ -2,32 +2,38 @@ const db = require("../models");
 const FlashcardTopic = db.FlashcardTopic;
 const FlashcardItem = db.FlashcardItem;
 exports.getFlashcardTopics = async (req, res) => {
-  console.log("👉 Yêu cầu lấy danh sách các chủ đề flashcard...");
+  console.log("👉 Yêu cầu lấy đầy đủ thông tin các chủ đề flashcard...");
 
   try {
-    // Tìm tất cả chủ đề, lấy cả _id và title
-    const topics = await FlashcardTopic.find({}, { title: 1 });
+    // Tìm tất cả chủ đề (không giới hạn fields nữa)
+    const topics = await FlashcardTopic.find(
+      { enabled: true, status: "available" } // 👈 Vẫn lọc enabled + available
+    );
 
     if (!Array.isArray(topics) || topics.length === 0) {
       return res.status(404).json({ message: "Không tìm thấy chủ đề nào." });
     }
-
-    // Trả về danh sách đối tượng với id và title
     const formattedTopics = topics.map(topic => ({
       id: topic._id,
-      title: topic.title
+      enabled: topic.enabled,
+      status: topic.status,
+      title: topic.title,
+      description: topic.description,
+      language: topic.language,
+      created_at: topic.created_at,
+      updated_at: topic.updated_at
     }));
+    
 
-    console.log("✅ Danh sách chủ đề:", formattedTopics); // Log để debug
+    console.log("✅ Danh sách đầy đủ chủ đề:", topics);
 
-    res.status(200).json(formattedTopics);
+    res.status(200).json(topics);
 
   } catch (err) {
     console.error("❌ Lỗi khi lấy chủ đề:", err);
-    res.status(500).json({ message: "Lỗi khi lấy tên chủ đề: " + err.message });
+    res.status(500).json({ message: "Lỗi khi lấy chủ đề: " + err.message });
   }
 };
-
 exports.getFlashcardsByTopicId = async (req, res) => {
   const { topicId } = req.params;
 

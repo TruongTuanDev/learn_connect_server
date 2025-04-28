@@ -1,7 +1,7 @@
-/*const mongoose = require("mongoose");
+const mongoose = require("mongoose");
 
 // Kết nối database
-mongoose.connect("mongodb://root:root@localhost:27017/learn_connect_server?authSource=admin", {
+mongoose.connect("mongodb://localhost:27017/learn_connect_server", {
   useNewUrlParser: true,
   useUnifiedTopology: true
 }).then(() => console.log("✅ Đã kết nối MongoDB"))
@@ -82,4 +82,3 @@ async function seed() {
 }
 
 seed();
-*/

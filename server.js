@@ -6,6 +6,7 @@ const cookieSession = require("cookie-session");
 const dbConfig = require("./app/config/db.config");
 const authConfig = require("./app/config/auth.config");
 
+
 const app = express();
 const server = http.createServer(app);
 const { Server } = require("socket.io");
@@ -43,7 +44,6 @@ app.use((req, res, next) => {
 
 const db = require("./app/models");
 const Role = db.role;
-
 // MongoDB connection
 db.mongoose
   .connect(dbConfig.url, {
@@ -65,12 +65,12 @@ try {
   require("./app/routes/like_comment.routes")(app);
   require("./app/routes/auth.routes")(app);
   require("./app/routes/user.routes")(app);
-<<<<<<< HEAD
+  const matchRoutes = require('./app/routes/match.routes');
+  app.use('/api/matches', matchRoutes);
+  
   const recommendRouter = require("./app/routes/recommend.routes");
   app.use('/api', recommendRouter);
-=======
- 
->>>>>>> 67c8a4b139ef7cb13916ed8ee194291ee19aba7e
+
   //Message API
   const messageRoutes = require("./app/routes/message.routes");
   app.use("/api", messageRoutes);
@@ -186,18 +186,14 @@ async function initial() {
       throw new Error("Role is not a valid Mongoose model. Check role.model.js and index.js");
     }
 
-    const count = await Role.countDocuments();
+    const count = await Role.estimatedDocumentCount();
     if (count === 0) {
-      await new Role({ name: "user" }).save();
-      console.log("added 'user' to roles collection");
-
-      await new Role({ name: "moderator" }).save();
-      console.log("added 'moderator' to roles collection");
-
-      await new Role({ name: "admin" }).save();
-      console.log("added 'admin' to roles collection");
-    } else {
-      console.log("Roles already exist in the collection");
+      await Promise.all([
+        new Role({ name: "user" }).save(),
+        new Role({ name: "moderator" }).save(),
+        new Role({ name: "admin" }).save()
+      ]);
+      console.log("Default roles added to the database");
     }
   } catch (err) {
     console.error("Error in initial function:", err);

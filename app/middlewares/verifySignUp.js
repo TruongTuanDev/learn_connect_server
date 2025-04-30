@@ -1,6 +1,9 @@
 const db = require("../models");
 const ROLES = db.ROLES;
-const User = db.user;
+const User = db.user; // Đảm bảo rằng bạn đã import đúng mô hình User từ db
+console.log("User là:", typeof User); 
+console.log("in từ mid 2"+db); 
+
 
 checkDuplicateUsernameOrEmail = (req, res, next) => {
   // Username

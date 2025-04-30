@@ -2,7 +2,7 @@ const config = require("../config/auth.config");
 const db = require("../models");
 const User = db.user;
 const Role = db.role;
-
+const UserInfor = db.UserInfo
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 
@@ -57,13 +57,32 @@ exports.signin = async (req, res) => {
     const token = jwt.sign({ id: user.id }, config.secret, { expiresIn: 86400 });
 
     const authorities = user.roles.map(role => "ROLE_" + role.name.toUpperCase());
- 
+    const userInfor = await UserInfor.findOne({ id_user: user._id }); // Hoặc user.id nếu bạn dùng _id là ObjectId
+    if (!userInfor) {
+      return res.status(404).json({ message: "UserInfor not found for user_id: " + user._id });
+    }
     res.status(200).json({
-      id: user._id,
-      username: user.username,
-      email: user.email,
+      user: {
+        id: user._id,
+        username: user.username,
+        email: user.email,
+      },
       roles: authorities,
       accessToken: token,
+      userInfor: {
+        fullName: userInfor.fullName || 'Chưa cập nhật',
+        nickname: userInfor.nickname || 'Chưa cập nhật',
+        birthDate: userInfor.birthDate || 'Chưa cập nhật',
+        email: userInfor.email,
+        phoneCode: userInfor.phoneCode || 'Chưa cập nhật',
+        gender: userInfor.gender || 'Khác',
+        nativeLanguage: userInfor.nativeLanguage,
+        targetLanguages: userInfor.targetLanguages,
+        learningGoals: userInfor.learningGoals,
+        dailyTime: userInfor.dailyTime,
+        interestedCountries: userInfor.interestedCountries,
+        culturalPreferences: userInfor.culturalPreferences
+      }
     });
 
   } catch (err) {

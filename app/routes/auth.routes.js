@@ -21,6 +21,10 @@ module.exports = function(app) {
     "/api/auth/updateInfor",
     controllerInfor.saveUserInfo
   );
+  app.post(
+    "/api/auth/updatenewInfor",
+    controllerInfor.savenewUserInfo
+  );
 
   router.post("/signout", controller.signout);
 

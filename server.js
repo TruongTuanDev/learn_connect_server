@@ -65,12 +65,10 @@ try {
   require("./app/routes/like_comment.routes")(app);
   require("./app/routes/auth.routes")(app);
   require("./app/routes/user.routes")(app);
-<<<<<<< HEAD
   const recommendRouter = require("./app/routes/recommend.routes");
   app.use('/api', recommendRouter);
-=======
+
  
->>>>>>> 67c8a4b139ef7cb13916ed8ee194291ee19aba7e
   //Message API
   const messageRoutes = require("./app/routes/message.routes");
   app.use("/api", messageRoutes);

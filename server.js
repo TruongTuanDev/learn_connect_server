@@ -66,8 +66,6 @@ try {
   require("./app/routes/auth.routes")(app);
   require("./app/routes/user.routes")(app);
 
-  const matchRoutes = require('./app/routes/match.routes');
-  app.use('/api/matches', matchRoutes);
   
   const recommendRouter = require("./app/routes/recommend.routes");
   app.use('/api', recommendRouter);

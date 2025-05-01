@@ -20,7 +20,8 @@ exports.saveUserInfo = async (req, res) => {
       learningGoals,
       dailyTime,
       interestedCountries,
-      culturalPreferences
+      culturalPreferences,
+      imageBytes
     } = req.body;
 
     if (!nativeLanguage) {
@@ -56,7 +57,8 @@ exports.saveUserInfo = async (req, res) => {
       learningGoals,
       dailyTime,
       interestedCountries,
-      culturalPreferences
+      culturalPreferences,
+      imageBytes
     });
 
     const savedUser = await newUser.save();
@@ -134,7 +136,8 @@ exports.savenewUserInfo = async (req, res) => {
       learningGoals,
       dailyTime,
       interestedCountries,
-      culturalPreferences
+      culturalPreferences,
+      imageBytes
     } = req.body;
 
     if (!id_user) {
@@ -168,6 +171,7 @@ exports.savenewUserInfo = async (req, res) => {
     user.dailyTime = dailyTime || user.dailyTime;
     user.interestedCountries = interestedCountries || user.interestedCountries;
     user.culturalPreferences = culturalPreferences || user.culturalPreferences;
+    user.imageBytes = imageBytes || user.imageBytes;
 
     const updatedUser = await user.save();
 

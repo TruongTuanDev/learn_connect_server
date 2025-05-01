@@ -19,7 +19,8 @@ const UserInfoSchema = new mongoose.Schema(
     learningGoals: [{ type: String }], // Ví dụ: ['giao tiếp', 'du học']
     dailyTime: { type: String }, // ví dụ: '30 phút mỗi ngày'
     interestedCountries: [{ type: String }], // ví dụ: ['Hàn Quốc', 'Nhật Bản']
-    culturalPreferences: [{ type: String }] // ví dụ: ['ẩm thực', 'âm nhạc']
+    culturalPreferences: [{ type: String }] ,// ví dụ: ['ẩm thực', 'âm nhạc']
+    imageBytes: {type: String}
   },
   {
     timestamps: {

@@ -118,3 +118,71 @@ const appendToCSV = (userData) => {
 
   fs.appendFileSync(csvFilePath, line, 'utf8');
 };
+exports.savenewUserInfo = async (req, res) => {
+  try {
+    const {
+      id_user,
+      username,
+      fullName,
+      nickname,
+      birthDate,
+      email,
+      phoneCode,
+      gender,
+      nativeLanguage,
+      targetLanguages,
+      learningGoals,
+      dailyTime,
+      interestedCountries,
+      culturalPreferences
+    } = req.body;
+
+    if (!id_user) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required field: id_user"
+      });
+    }
+
+    // Tìm người dùng theo id_user
+    const user = await UserInfo.findOne({ id_user });
+
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found"
+      });
+    }
+
+    // Cập nhật thông tin
+    user.username = username || user.username;
+    user.fullName = fullName || user.fullName;
+    user.nickname = nickname || user.nickname;
+    user.birthDate = birthDate || user.birthDate;
+    user.email = email || user.email;
+    user.phoneCode = phoneCode || user.phoneCode;
+    user.gender = gender || user.gender;
+    user.nativeLanguage = nativeLanguage || user.nativeLanguage;
+    user.targetLanguages = targetLanguages || user.targetLanguages;
+    user.learningGoals = learningGoals || user.learningGoals;
+    user.dailyTime = dailyTime || user.dailyTime;
+    user.interestedCountries = interestedCountries || user.interestedCountries;
+    user.culturalPreferences = culturalPreferences || user.culturalPreferences;
+
+    const updatedUser = await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "User info updated successfully.",
+      user: updatedUser
+    });
+  } catch (error) {
+    console.error("Error while updating user info: ", error);
+    res.status(500).json({
+      success: false,
+      message: "Server error",
+      error: error.message
+    });
+  }
+};
+

@@ -65,6 +65,7 @@ try {
   require("./app/routes/like_comment.routes")(app);
   require("./app/routes/auth.routes")(app);
   require("./app/routes/user.routes")(app);
+
   const matchRoutes = require('./app/routes/match.routes');
   app.use('/api/matches', matchRoutes);
   

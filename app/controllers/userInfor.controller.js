@@ -171,7 +171,7 @@ exports.savenewUserInfo = async (req, res) => {
     user.dailyTime = dailyTime || user.dailyTime;
     user.interestedCountries = interestedCountries || user.interestedCountries;
     user.culturalPreferences = culturalPreferences || user.culturalPreferences;
-    user.imageBytes = imageBytes || user.imageBytes;
+    
 
     const updatedUser = await user.save();
 

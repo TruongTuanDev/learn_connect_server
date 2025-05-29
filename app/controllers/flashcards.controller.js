@@ -1,6 +1,8 @@
 const db = require("../models");
+const Word = require("../models/Flashcard");
 const FlashcardTopic = db.FlashcardTopic;
 const FlashcardItem = db.FlashcardItem;
+const Flashcard = db.Flashcard;
 exports.getFlashcardTopics = async (req, res) => {
   console.log("👉 Yêu cầu lấy đầy đủ thông tin các chủ đề flashcard...");
 
@@ -34,6 +36,35 @@ exports.getFlashcardTopics = async (req, res) => {
     res.status(500).json({ message: "Lỗi khi lấy chủ đề: " + err.message });
   }
 };
+// POST /api/flashcards/save
+exports.saveFlashcards = async (req, res) => { 
+try {
+    const { userId, response } = req.body;
+
+    const newRes = new Word({ userId, response });
+    await newRes.save();
+    res.status(200).json(newRes);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: 'Error saving flashcards' });
+  }
+}
+exports.getWordById = async (req, res) => {
+   const { userId } = req.params;
+  console.log("👉 Yêu cầu lấy từ mới nhất của người dùng:", userId);
+   try {
+    const latestWord = await Word.find({ userId: userId }).sort({ createdAt: -1 }).limit(1);
+    console.log("👉 Từ cuối :", latestWord);
+
+    res.json(latestWord);
+  } catch (error) {
+    console.log("👉 Lỗi tele :", error);
+
+    res.status(500).json({ message: 'Error fetching words', error });
+  }
+}
+
+
 exports.getFlashcardsByTopicId = async (req, res) => {
   const { topicId } = req.params;
 

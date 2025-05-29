@@ -19,4 +19,13 @@ module.exports = function (app) {
     "/api/flashcard/topics/:topicId/items",
     controller.getFlashcardsByTopicId
   );
+   app.get(
+    "/api/words/:userId",
+    controller.getWordById
+  );
+  // POST /api/flashcards/save
+   app.post(
+    "/api/flashcards/save",
+    controller.saveFlashcards
+  );
 };

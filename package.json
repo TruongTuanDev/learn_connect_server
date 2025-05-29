@@ -28,6 +28,7 @@
     "express": "^4.21.2",
     "jsonwebtoken": "^8.5.1",
     "mongoose": "^5.13.23",
+    "python-shell": "^5.0.0",
     "socket.io": "^4.8.1"
   }
 }

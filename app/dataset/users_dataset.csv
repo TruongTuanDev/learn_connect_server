@@ -15,3 +15,8 @@ id_user,username,nativeLanguage,targetLanguages,learningGoals,dailyTime,interest
 "6813496828fd3c347c6dff95","tam","Tiếng Việt","Tiếng Hàn:Sơ cấp","Giao tiếp","30 phút","Hàn Quốc","Âm nhạc|Du lịch"
 "❌ Lỗi: Failed! Email is already in use!","tam123hc","Tiếng Việt","Tiếng Hàn:Sơ cấp","Giao tiếp","30 phút","Hàn Quốc|Anh","Âm nhạc|Phim ảnh"
 "681371c4dc58c243ec1fc258","quangthai","Tiếng Việt","Tiếng Hàn:Trung cấp","Giao tiếp,Du học","60 phút","Hàn Quốc|Anh","Âm nhạc|Ẩm thực"
+"6813c4e88ee5230c6c39efb2","tuanhulo1","Tiếng Việt","Tiếng Anh:Sơ cấp","Giao tiếp","30 phút","Hàn Quốc","Lịch sử"
+"","phuc","Tiếng Việt","Tiếng Hàn:Sơ cấp","Giao tiếp","30 phút","Việt Nam","Âm nhạc"
+"6815ad6decbb3522e41e3fab","phuc1","Tiếng Việt","Tiếng Anh:Sơ cấp|Tiếng Nhật:Sơ cấp|Tiếng Hàn:Sơ cấp","Du học","30 phút","Việt Nam","Lịch sử"
+"❌ Lỗi: Failed! Username is already in use!","tuan2","Tiếng Việt","Tiếng Anh:Sơ cấp","Giao tiếp","30 phút","Trung Quốc","Lịch sử"
+"❌ Lỗi: E11000 duplicate key error collection: learn_connect_server.users index: username_1 dup key: { username: ""hhh"" }","hhh","Tiếng Việt","Tiếng Anh:Sơ cấp","Du học","30 phút","Việt Nam","Lịch sử"

@@ -4,7 +4,7 @@ const User = db.user;
 const Role = db.role;
 
 const UserInfor = db.UserInfo
-
+const addfriend = db.addfriend
 console.log("DB loaded:", Object.keys(db));
 
 
@@ -99,7 +99,15 @@ exports.signin = async (req, res) => {
     if (!userInfo) {
       return res.status(404).json({ message: "User info not found" });
     }
-
+// Lấy danh sách bạn bè đã thêm
+    
+    const addFriends = await addfriend.find({ id_friend: user._id.toString() });
+    console.log("Danh sách bạn bè lấy được:", addFriends);
+     if (!addFriends) {
+      return res.status(404).json({ message: "User info not found" });
+    }
+    
+   
     // Logic tìm kiếm người dùng phù hợp linh hoạt
     let matchedUsers = [];
     if (userInfo.nativeLanguage && userInfo.targetLanguages) {
@@ -129,9 +137,10 @@ exports.signin = async (req, res) => {
       roles: authorities,
       accessToken: token,
       userInfo: userInfo,
-      matchedLanguagePartners: matchedUsers
+      matchedLanguagePartners: matchedUsers,
+      addFriends: addFriends
     };
-
+    
     res.status(200).json(responseData);
 
   } catch (err) {

@@ -34,7 +34,11 @@ exports.getChatList = async (req, res) => {
 
     const objectUserId = new mongoose.Types.ObjectId(userId);
 
-    const chats = await Message.aggregate([
+    // Lấy tất cả user trừ chính nó
+    const allUsers = await mongoose.model("User").find({ _id: { $ne: objectUserId } });
+
+    // Lấy danh sách chat hiện tại có tin nhắn
+    const messages = await Message.aggregate([
       {
         $match: {
           $or: [
@@ -60,42 +64,36 @@ exports.getChatList = async (req, res) => {
           _id: "$conversationId",
           lastMessage: { $first: "$$ROOT" }
         }
-      },
-      {
-        $addFields: {
-          otherUserId: {
-            $cond: [
-              { $eq: ["$lastMessage.senderId", objectUserId] },
-              "$lastMessage.receiverId",
-              "$lastMessage.senderId"
-            ]
-          }
-        }
-      },
-      {
-        $lookup: {
-          from: "users",
-          localField: "otherUserId",
-          foreignField: "_id",
-          as: "otherUser"
-        }
-      },
-      { $unwind: "$otherUser" },
-      {
-        $project: {
-          _id: 0,
-          otherUserId: 1,
-          username: "$otherUser.username",
-          lastMessage: "$lastMessage.content",
-          timestamp: "$lastMessage.timestamp"
-        }
-      },
-      { $sort: { timestamp: -1 } }
+      }
     ]);
 
-    res.json(chats);
+    // Map từ userId còn lại và gán tin nhắn nếu có
+    const chatList = allUsers.map(user => {
+      const matchedMessage = messages.find(m => {
+        const sender = m.lastMessage.senderId.toString();
+        const receiver = m.lastMessage.receiverId.toString();
+        return (sender === userId && receiver === user._id.toString()) ||
+               (receiver === userId && sender === user._id.toString());
+      });
+
+      return {
+        otherUserId: user._id,
+        username: user.username,
+        lastMessage: matchedMessage ? matchedMessage.lastMessage.content : null,
+        timestamp: matchedMessage ? matchedMessage.lastMessage.timestamp : null
+      };
+    });
+
+    // Sắp xếp giảm dần theo thời gian, những người chưa nhắn tin ở cuối
+    chatList.sort((a, b) => {
+      if (!a.timestamp) return 1;
+      if (!b.timestamp) return -1;
+      return new Date(b.timestamp) - new Date(a.timestamp);
+    });
+
+    res.json(chatList);
   } catch (error) {
-    console.error("Lỗi khi lấy danh sách chat:", error);
+console.error("Lỗi khi lấy danh sách chat:", error);
     res.status(500).json({ message: "Lỗi server" });
   }
 };
